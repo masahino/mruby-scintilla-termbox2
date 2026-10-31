@@ -3,17 +3,17 @@ MRuby::Gem::Specification.new('mruby-scintilla-termbox2') do |spec|
   spec.authors = 'masahino'
   spec.add_dependency 'mruby-scintilla-base', github: 'masahino/mruby-scintilla-base'
   spec.add_dependency 'mruby-termbox2', github: 'masahino/mruby-termbox2'
-  spec.version = '5.6.7'
+  spec.version = '5.6.8'
 
   def spec.download_scintilla
     return if @scintilla_download_configured
 
     @scintilla_download_configured = true
     require 'open-uri'
-    scintilla_ver = '567'
+    scintilla_ver = '568'
     scintilla_url = "https://scintilla.org/scintilla#{scintilla_ver}.tgz"
     scintilla_termbox2_url = 'https://github.com/masahino/scintilla-termbox2'
-    scintilla_build_root = "#{build_dir}/scintilla/"
+    scintilla_build_root = "#{build_dir}/scintilla-#{scintilla_ver}/"
     scintilla_dir = "#{scintilla_build_root}/scintilla"
     scintilla_a = "#{scintilla_dir}/bin/scintilla.a"
     scintilla_termbox2_dir = "#{scintilla_dir}/termbox2"
@@ -41,8 +41,9 @@ MRuby::Gem::Specification.new('mruby-scintilla-termbox2') do |spec|
       sh 'git', 'clone', '--depth', '1', scintilla_termbox2_url, scintilla_termbox2_dir
     end
 
+    debug_option = build.debug_enabled? ? 'DEBUG=1' : ''
     file scintilla_a => [scintilla_h, scintilla_termbox2_h] do
-      sh %((cd #{scintilla_termbox2_dir} && make -j4 CXX=#{build.cxx.command} AR=#{build.archiver.command} EXTRA_FLAGS="#{flags}"))
+      sh %((cd #{scintilla_termbox2_dir} && make -j4 CXX=#{build.cxx.command} AR=#{build.archiver.command} #{debug_option} EXTRA_FLAGS="#{flags}"))
     end
 
     task :mruby_scintilla_termbox2_compile_option do
